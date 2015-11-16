@@ -128,6 +128,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
+      propertyPath: usePositionTracking
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
   m_IsPrefabParent: 0
@@ -196,6 +200,14 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: dac70247fbfc05740b3fbb2739abbc2b, type: 2}
       propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: dac70247fbfc05740b3fbb2739abbc2b, type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 100004, guid: dac70247fbfc05740b3fbb2739abbc2b, type: 2}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -300,8 +312,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68659c0c9b63983478e46690211ea692, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enable_mask: 1
+  enable_mask: 0
   mask_material: {fileID: 2100000, guid: 67881eb4e69b6ab47ac4aaef756a2b9d, type: 2}
+  enable_cloud: 1
   enable_HSKL: 0
   hand_w: .0799999982
   hand_h: .189999998

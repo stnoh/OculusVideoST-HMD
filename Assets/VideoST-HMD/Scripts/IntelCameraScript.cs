@@ -13,6 +13,8 @@ public class IntelCameraScript : MonoBehaviour
     public bool enable_mask = true;
     public Material mask_material = null;
 
+    public bool enable_cloud = false;
+
     public bool enable_HSKL = false;
     public float hand_w = 0.08f;
     public float hand_h = 0.19f;
@@ -43,7 +45,8 @@ public class IntelCameraScript : MonoBehaviour
     #region PUBLIC_MEMBERS
 
     public RawDepthMeshImpl mRawDepthMeshImpl = null;
-    public HSKLTrackerImpl  mHSKLTrackerImpl = null;
+    public RawPointCloudImpl mRawPointCloudImpl = null;
+    public HSKLTrackerImpl mHSKLTrackerImpl = null;
 
     #endregion // PUBLIC_MEMBERS
 
@@ -59,6 +62,7 @@ public class IntelCameraScript : MonoBehaviour
 
         // instantiate classes
         if (enable_mask) mRawDepthMeshImpl = new RawDepthMeshImpl(this.gameObject, mask_material);
+        if (!enable_mask && enable_cloud) mRawPointCloudImpl = new RawPointCloudImpl(this.gameObject);
         if (enable_HSKL)
         {
             // initialize HSKL/CAPE binary module
@@ -70,6 +74,7 @@ public class IntelCameraScript : MonoBehaviour
     void Update () 
     {
         if (mRawDepthMeshImpl != null) mRawDepthMeshImpl.Update();
+        if (mRawPointCloudImpl != null) mRawPointCloudImpl.Update();
         if (mHSKLTrackerImpl != null) mHSKLTrackerImpl.Update();
     }
 
@@ -77,6 +82,7 @@ public class IntelCameraScript : MonoBehaviour
     {
         // destroy instances
         if (mRawDepthMeshImpl != null) mRawDepthMeshImpl.OnDestroy();
+        if (mRawPointCloudImpl != null) mRawPointCloudImpl.OnDestroy();
         if (mHSKLTrackerImpl != null)
         {
             mHSKLTrackerImpl.OnDestroy();
