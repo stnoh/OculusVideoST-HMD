@@ -69,6 +69,9 @@ public class OVRCameraRig : MonoBehaviour
 	private readonly string eyeAnchorName = "EyeAnchor";
 	private readonly string legacyEyeAnchorName = "Camera";
 
+	//Set ovrvision Right-eye Gap
+	public Vector3 ovrvisionRightEyeGap = new Vector3(0.064f, 0.0f, 0.0f); // set as Oculus default value
+
 #region Unity Messages
 	private void Awake()
 	{
@@ -129,9 +132,21 @@ public class OVRCameraRig : MonoBehaviour
 		rightEyeAnchor.localRotation = monoscopic ? centerEyeAnchor.localRotation : hmdRightEye.orientation;
 
 		trackerAnchor.localPosition = tracker.position;
+
+        /*
 		centerEyeAnchor.localPosition = 0.5f * (hmdLeftEye.position + hmdRightEye.position);
 		leftEyeAnchor.localPosition = monoscopic ? centerEyeAnchor.localPosition : hmdLeftEye.position;
 		rightEyeAnchor.localPosition = monoscopic ? centerEyeAnchor.localPosition : hmdRightEye.position;
+        //*/
+
+        ////////////////////////////////////////////////////////////
+        // using ovrvision eyegap for stereoscopic display
+        ////////////////////////////////////////////////////////////
+        Vector3 pos_tracking = 0.5f * (hmdLeftEye.position + hmdRightEye.position);
+
+        leftEyeAnchor.localPosition = monoscopic ? pos_tracking : hmdLeftEye.orientation * (-0.5f * ovrvisionRightEyeGap) + pos_tracking;
+        rightEyeAnchor.localPosition = monoscopic ? pos_tracking : hmdRightEye.orientation * (0.5f * ovrvisionRightEyeGap) + pos_tracking;
+        centerEyeAnchor.localPosition = 0.5f * (leftEyeAnchor.localPosition + rightEyeAnchor.localPosition);
 
 		if (UpdatedAnchors != null)
 		{
