@@ -19,3 +19,7 @@
 
 # Unity3D Generated File On Crash Reports
 sysinfo.txt
+
+# Need license
+Assets/Plugins/x86*/hskl*.dll
+Assets/Plugins/x86*/hskl*.dll.meta
