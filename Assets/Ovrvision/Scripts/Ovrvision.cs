@@ -251,6 +251,9 @@ public class Ovrvision : MonoBehaviour
 
 		go_cameraPlaneLeft.GetComponent<Renderer>().material.mainTexture = go_CamTexLeft;
 		go_cameraPlaneRight.GetComponent<Renderer>().material.mainTexture = go_CamTexRight;
+
+        // start the image update thread
+        ThreadStart();
 	}
 
 	// Update is called once per frame
@@ -260,6 +263,8 @@ public class Ovrvision : MonoBehaviour
 		if (!camStatus)
 			return;
 
+        // [DEPRECATED]
+        /*
         if (go_pixelsPointerLeft == System.IntPtr.Zero || 
             go_pixelsPointerRight == System.IntPtr.Zero)
             return;
@@ -270,6 +275,10 @@ public class Ovrvision : MonoBehaviour
 			OvrvisionARRender();
 		} else
 			ovGetCamImageForUnity(go_pixelsPointerLeft, go_pixelsPointerRight, useProcessingQuality);
+        //*/
+
+        // synchronize thread
+        ThreadUpdate();
 
 		//Apply
 		go_CamTexLeft.SetPixels32(go_pixelsColorLeft);
@@ -362,6 +371,9 @@ public class Ovrvision : MonoBehaviour
 	// Quit
 	void OnDestroy()
 	{
+        // end the image update thread
+        ThreadEnd();
+
 		if (!camStatus)
 			return;
 
@@ -418,4 +430,91 @@ public class Ovrvision : MonoBehaviour
             go_cameraPlaneRight.GetComponent<Renderer>().material.SetFloat("_Color_minv", chroma_brightness.y);
         }
 	}
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Additional functionality (1) update by thread for speed-up
+    // The original code is from here: 
+    // https://gist.github.com/hecomi/e5af54b8269a9e85172c
+    ////////////////////////////////////////////////////////////////////////////////
+
+    #region UPDATE_THREAD
+
+    private Thread ovrvisionTextureThread;
+    private Mutex ovrvisionTextureThreadMutex;
+
+    void ThreadStart()
+    {
+        // Create thread
+        ovrvisionTextureThreadMutex = new Mutex(true);
+        ovrvisionTextureThread = new Thread(OvrvisionTextureThreadFunc);
+        ovrvisionTextureThread.Start();
+    }
+
+    void ThreadUpdate()
+    {
+        ovrvisionTextureThreadMutex.ReleaseMutex();
+        ovrvisionTextureThreadMutex.WaitOne();
+
+        if (go_pixelsPointerLeft == System.IntPtr.Zero ||
+            go_pixelsPointerRight == System.IntPtr.Zero)
+            return;
+
+        if (useOvrvisionAR)
+            OvrvisionARRender();
+    }
+
+    void ThreadEnd()
+    {
+        ovrvisionTextureThread.Abort();
+    }
+
+    void OvrvisionTextureThreadFunc()
+    {
+        try
+        {
+            _OvrvisionTextureThreadFunc();
+        }
+        catch (System.Exception e)
+        {
+            if (!(e is ThreadAbortException))
+            {
+                Debug.LogError("Unexpected Death: " + e.ToString());
+            }
+        }
+    }
+
+    void _OvrvisionTextureThreadFunc()
+    {
+        while (true)
+        {
+            Thread.Sleep(1);
+            if (useOvrvisionAR)
+                ovGetCamImageForUnityWithAR(go_pixelsPointerLeft, go_pixelsPointerRight, useProcessingQuality);
+            else
+                ovGetCamImageForUnity(go_pixelsPointerLeft, go_pixelsPointerRight, useProcessingQuality);
+
+            ovrvisionTextureThreadMutex.WaitOne();
+            {
+                // nothing to do 
+            }
+            ovrvisionTextureThreadMutex.ReleaseMutex();
+        }
+    }
+
+    #endregion // UPDATE_THREAD
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Additional functionality (2) get image array pointer
+    ////////////////////////////////////////////////////////////////////////////////
+
+    #region PUBLIC_METHODS
+
+    public System.IntPtr getLeftImagePtr() { return go_pixelsPointerLeft; }
+
+    public float getFocalLength() { return -camProp.focalPoint; }
+
+    #endregion // PUBLIC_METHODS
 }
