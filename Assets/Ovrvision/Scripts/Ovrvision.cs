@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿/*******************************************************************************
+The original source code is "OvrVision.cs" in OvrVision SDK v2.16 (2015-03-25)
+You can download it from: http://dev.ovrvision.com/doc_en/index.php?downloads
+Modified by Seung-Tak Noh (seungtak.noh [at] gmail.com), 2013-2015
+*******************************************************************************/
+using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -144,11 +149,18 @@ public class Ovrvision : MonoBehaviour
         camProp.AwakePropSaveToXML();
 
 		//Hmd Type
+		try
+		{
 		Ovr.HmdDesc desc = OVRManager.capiHmd.GetDesc();
-		if (desc.Type == Ovr.HmdType.DK1)
-			hmdType = OV_HMD_OCULUS_DK1;
-		else if (desc.Type == Ovr.HmdType.DK2)
-			hmdType = OV_HMD_OCULUS_DK2;
+			if (desc.Type == Ovr.HmdType.DK1)
+				hmdType = OV_HMD_OCULUS_DK1;
+			else if (desc.Type == Ovr.HmdType.DK2)
+				hmdType = OV_HMD_OCULUS_DK2;
+		}
+		catch
+		{
+			Debug.LogError("Not found the oculus camera in a game scene!");
+		}
 
 		//Open camera
 		if (ovOpen(0, arSize, hmdType) == 0) {
@@ -176,19 +188,28 @@ public class Ovrvision : MonoBehaviour
 
 		//in Oculus Rift camera
 		if (GameObject.Find("LeftEyeAnchor"))
+		{
 			go_cameraPlaneLeft.transform.parent = GameObject.Find("LeftEyeAnchor").transform;
-		if (GameObject.Find("RightEyeAnchor"))
-			go_cameraPlaneRight.transform.parent = GameObject.Find("RightEyeAnchor").transform;
+			go_cameraPlaneLeft.transform.localPosition = new Vector3(0.0f, 0.0f, 5.0f);	//Default
+			go_cameraPlaneLeft.transform.localRotation = Quaternion.Euler(270.0f, 0.0f, 0.0f);
 
-		go_cameraPlaneLeft.transform.localPosition = new Vector3(0.0f, 0.0f, 5.0f);	//Default
-		go_cameraPlaneLeft.transform.localRotation = Quaternion.Euler(270.0f, 0.0f, 0.0f);
-		go_cameraPlaneRight.transform.localPosition = new Vector3(0.0f, 0.0f, 5.0f);
-		go_cameraPlaneRight.transform.localRotation = Quaternion.Euler(270.0f, 0.0f, 0.0f);
+			Camera cam_L = GameObject.Find("LeftEyeAnchor").GetComponent<Camera>();
+			cam_L.cullingMask = ~(1 << go_cameraPlaneRight.layer);
+		}
+		if (GameObject.Find("RightEyeAnchor"))
+		{
+			go_cameraPlaneRight.transform.parent = GameObject.Find("RightEyeAnchor").transform;
+			go_cameraPlaneRight.transform.localPosition = new Vector3(0.0f, 0.0f, 5.0f);
+			go_cameraPlaneRight.transform.localRotation = Quaternion.Euler(270.0f, 0.0f, 0.0f);
+			Camera cam_R = GameObject.Find("RightEyeAnchor").GetComponent<Camera>();
+			cam_R.cullingMask = ~(1 << go_cameraPlaneLeft.layer);
+		}
 
 		//Set right eye gap
-		if (GameObject.Find("OVRCameraRig"))
-			GameObject.Find("OVRCameraRig").GetComponent<OVRCameraRig>().ovrvisionRightEyeGap
-				= new Vector3(ovGetOculusRightGap(0) * 0.01f, ovGetOculusRightGap(1) * 0.01f, ovGetOculusRightGap(2) * 0.01f); // 1/100
+		const float scale = 0.001f; // 1/1000 [m]:[mm]
+        if (GameObject.Find("OVRCameraRig"))
+            GameObject.Find("OVRCameraRig").GetComponent<OVRCameraRig>().ovrvisionRightEyeGap
+                = scale * new Vector3(ovGetOculusRightGap(0), ovGetOculusRightGap(1), ovGetOculusRightGap(2));
 
         if (camViewShader == 0)
         {   //Normal shader
@@ -257,7 +278,7 @@ public class Ovrvision : MonoBehaviour
 		go_CamTexRight.Apply();
 
 		//Key Input
-		CameraViewKeySetting ();
+//		CameraViewKeySetting (); [DEPRECATED]
 	}
 
 	//GUI view
@@ -272,7 +293,8 @@ public class Ovrvision : MonoBehaviour
 		}
 	}
 	
-	//CameraViewKeySetting method
+	//CameraViewKeySetting method [DEPRECATED]
+	/*
 	void CameraViewKeySetting()
 	{
 		//Camera View Setting
@@ -305,6 +327,7 @@ public class Ovrvision : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.Alpha4))
 			useProcessingQuality = OV_PSQT_REFSET;
 	}
+	//*/
 
 	//Ovrvision AR Render to OversitionTracker Objects.
 	int OvrvisionARRender()
