@@ -21,7 +21,7 @@ public class RawPointCloudImpl
     [DllImport(CAMERA_CLIENT_DLL)]
     private static extern void copyIntelCameraPointCloud(IntPtr arrayPtr, int w, int h, int offset_i, int offset_j);
     [DllImport(CAMERA_CLIENT_DLL)]
-    private static extern void copyIntelCameraPointUV(IntPtr arrayPtr, int w, int h, int offset_i, int offset_j);
+    private static extern void copyIntelCameraPointUVmap(IntPtr arrayPtr, int w, int h, int offset_i, int offset_j);
 
     [DllImport(CAMERA_CLIENT_DLL)]
     private static extern void getIntelCameraColorImage(out int w, out int h);
@@ -292,7 +292,7 @@ public class RawPointCloudImpl
         {
             Thread.Sleep(1);
             copyIntelCameraPointCloud(floatArrayPtr, DEPTH_WIDTH, DEPTH_HEIGHT, 0, 0);
-            copyIntelCameraPointUV(float_uvArrayPtr, DEPTH_WIDTH, DEPTH_HEIGHT, 0, 0);
+            copyIntelCameraPointUVmap(float_uvArrayPtr, DEPTH_WIDTH, DEPTH_HEIGHT, 0, 0);
             copyIntelCameraColorImage(pixelsPointerColor);
 
             CloudThreadMutex.WaitOne();
