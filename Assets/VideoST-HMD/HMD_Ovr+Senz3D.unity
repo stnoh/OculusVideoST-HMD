@@ -210,6 +210,10 @@ Prefab:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: dac70247fbfc05740b3fbb2739abbc2b, type: 2}
+      propertyPath: useOvrvisionAR
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: dac70247fbfc05740b3fbb2739abbc2b, type: 2}
   m_IsPrefabParent: 0
