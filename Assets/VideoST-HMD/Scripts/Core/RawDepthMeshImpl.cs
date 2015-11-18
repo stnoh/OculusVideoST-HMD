@@ -26,6 +26,7 @@ public class RawDepthMeshImpl
 
     #region CONSTANTS
 
+    private const float DIST_THRESHOLD = 0.5f; // [m]
     private const float OFFSET_Z = 0.200f; // visibility checking by Unity
     private const int WIDTH = 290;
     private const int HEIGHT = 220;
@@ -184,7 +185,7 @@ public class RawDepthMeshImpl
             float y = -(floatArray[3 * (i + j * WIDTH) + 1]);
             float z =  (floatArray[3 * (i + j * WIDTH) + 2]) - OFFSET_Z;
 
-            if (z + OFFSET_Z > 0.5) x = y = z = Mathf.Infinity;
+            if (z + OFFSET_Z > DIST_THRESHOLD) x = y = z = Mathf.Infinity;
 
             vertices[i + j * WIDTH] = new Vector3(x, y, z);
         }
