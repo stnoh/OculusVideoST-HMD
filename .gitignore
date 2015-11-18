@@ -23,3 +23,10 @@ sysinfo.txt
 # Need license
 Assets/Plugins/x86*/hskl*.dll
 Assets/Plugins/x86*/hskl*.dll.meta
+
+# Ignore large 3D model & texture assets
+Assets/LeapMotion/Models/RiggedPepperCut*
+Assets/LeapMotion/Models/RiggedPepperRounded*
+Assets/LeapMotion/Models/RiggedSalt*
+Assets/LeapMotion/Textures/Pepper_*
+Assets/LeapMotion/Textures/Salt_*
