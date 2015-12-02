@@ -50,7 +50,7 @@ public class RawPointCloudImpl
     public ParticleSystem pointCloud;
     public ParticleSystem.Particle[] points;
 
-    readonly GameObject _root; // [FIX ME LATER]
+    private readonly GameObject mDepthCamera = null;
 
     private bool init = false;
 
@@ -81,14 +81,14 @@ public class RawPointCloudImpl
 
     public RawPointCloudImpl(GameObject depthCamera)
 	{
-        _root = depthCamera; // [FIX ME LATER]
+        mDepthCamera = depthCamera;
 
         initIntelCameraClient(0);
 
         // hieararchy in depth camera
         mPointCloudVisualizer = new GameObject("RawPointCloud");
         mPointCloudVisualizer.transform.parent = depthCamera.transform;
-        mPointCloudVisualizer.transform.localPosition = new Vector3(0, 0, OFFSET_Z);
+        mPointCloudVisualizer.transform.localPosition = new Vector3(0, 0, OFFSET_Z); // to prevent culling
         mPointCloudVisualizer.transform.localRotation = Quaternion.identity;
         mPointCloudVisualizer.transform.localScale = Vector3.one;
 
@@ -170,7 +170,7 @@ public class RawPointCloudImpl
         pointCloud.maxParticles = DEPTH_WIDTH * DEPTH_HEIGHT;
         pointCloud.loop = false;
         pointCloud.playOnAwake = true;
-        pointCloud.simulationSpace = ParticleSystemSimulationSpace.World; // [FIX ME LATER] --- Local, if bug is fixed
+        pointCloud.simulationSpace = ParticleSystemSimulationSpace.Local;
 
         // renderer setting
         Renderer renderer = pointCloud.GetComponent<Renderer>();
@@ -184,15 +184,8 @@ public class RawPointCloudImpl
         init = true;
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////////
-    // FIX ME LATER : THEORETICALLY UNNECESSARY
-    // but, Unity 5's ParticleSystem has a small issue, so I calculate it directly.
-    ////////////////////////////////////////////////////////////////////////////////
     private void UpdatePointCloudVisualizer(bool aligned)
     {
-        Matrix4x4 convert = _root.transform.localToWorldMatrix;
-
         ////////////////////////////////////////
         // get the positions of point
         ////////////////////////////////////////
@@ -210,7 +203,7 @@ public class RawPointCloudImpl
 
             const float scale_up = 0.01f;
             particle.size = 0.0025f + scale_up * z;
-            particle.position = convert.MultiplyPoint(new Vector3(x, y, z));
+            particle.position = new Vector3(x, y, z - OFFSET_Z); // compensate for offset
 
             // get the color from color image texture
             float u = 1.0f - float_uvArray[2 * (i + j * DEPTH_WIDTH) + 0] / COLOR_WIDTH;
