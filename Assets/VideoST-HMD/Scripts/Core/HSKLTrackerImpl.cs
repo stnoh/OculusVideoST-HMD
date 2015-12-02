@@ -8,9 +8,6 @@ This C# script is written by Seung-Tak Noh (seungtak.noh [at] gmail.com), 2013-2
 using UnityEngine;
 using System;
 using System.Runtime.InteropServices;
-using System; // Serializable Attribute 
-using System.IO; // MemoryStreams
-using System.Runtime.Serialization.Formatters.Binary; // BinaryFormatters
 using System.Threading;
 
 public class HSKLTrackerImpl
